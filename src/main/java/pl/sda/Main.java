@@ -1,15 +1,20 @@
 package pl.sda;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import org.h2.jdbcx.JdbcDataSource;
 
 import javax.sql.DataSource;
 import java.sql.*;
 
 public class Main {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/sakila?serverTimezone=Europe/Warsaw";
+//    private static final String DB_URL = "jdbc:mysql://localhost:3306/sakila?serverTimezone=Europe/Warsaw";
+    private static final String DB_URL =  "jdbc:h2:~/test2";
+    ;
+//    private static final String USER = "root";
+    private static final String USER = "sa";
+//    private static final String PASSWORD = "12345";
+    private static final String PASSWORD = "";
 
-    private static final String USER = "root";
-    private static final String PASSWORD = "12345";
 
     public static void returnAllActors(MysqlDataSource ds){
         try (Connection con = ds.getConnection()){
@@ -155,7 +160,8 @@ public class Main {
 
     public static void main(String[] args) throws ClassNotFoundException {
 //        Class.forName("com.mysql.cj.jdbc.Driver");
-        MysqlDataSource ds = new MysqlDataSource();
+        //MysqlDataSource ds = new MysqlDataSource();
+        JdbcDataSource ds = new JdbcDataSource();
         ds.setUrl(DB_URL);
         ds.setUser(USER);
         ds.setPassword(PASSWORD);
@@ -163,11 +169,11 @@ public class Main {
         //returnAllActors(ds);
         //getActorWithId(ds, 3);
         //getActorWithNameAndSurnameMatchingPattern(ds, "%b%", "%a%");
-//        deleteTableMovies(ds);
-//        createTableMovies(ds);
-//        insertIntoMovies(ds);
-//        deleteFromMoviesFilmWithId(ds, 2);
+       deleteTableMovies(ds);
+        createTableMovies(ds);
+        insertIntoMovies(ds);
+        deleteFromMoviesFilmWithId(ds, 2);
 //        switchRecord1And3(ds);
-        switchRecord1And3WithParameters(ds, 3, 1);
+        //switchRecord1And3WithParameters(ds, 3, 1);
     }
 }
