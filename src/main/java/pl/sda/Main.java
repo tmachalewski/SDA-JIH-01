@@ -7,13 +7,13 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 public class Main {
-//    private static final String DB_URL = "jdbc:mysql://localhost:3306/sakila?serverTimezone=Europe/Warsaw";
-    private static final String DB_URL =  "jdbc:h2:~/test2";
-    ;
-//    private static final String USER = "root";
-    private static final String USER = "sa";
-//    private static final String PASSWORD = "12345";
-    private static final String PASSWORD = "";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/cinema?serverTimezone=Europe/Warsaw";
+    //private static final String DB_URL =  "jdbc:h2:~/test2";
+
+    private static final String USER = "root";
+//    private static final String USER = "sa";
+    private static final String PASSWORD = "12345";
+//    private static final String PASSWORD = "";
 
 
     public static void returnAllActors(MysqlDataSource ds){
@@ -49,6 +49,8 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+
 
     public static void getActorWithNameAndSurnameMatchingPattern(MysqlDataSource ds, String namePattern, String surnamePattern){
         try (Connection con = ds.getConnection()){
@@ -104,6 +106,17 @@ public class Main {
         }
     }
 
+    public static void editMovie(DataSource ds, int id, String newTitle){
+        try(Connection con = ds.getConnection()){
+            PreparedStatement prst = con.prepareStatement("Update movies set title=? where id=?");
+            prst.setInt(2, id);
+            prst.setString(1, newTitle);
+            prst.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+    }
     public static void insertIntoMovies(DataSource ds)
     {
         try(Connection con = ds.getConnection()) {
@@ -115,6 +128,30 @@ public class Main {
             stmt.execute(insert1);
             stmt.execute(insert2);
             stmt.execute(insert3);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void selectAndDelete(DataSource ds, int id)
+    {
+        try(Connection con = ds.getConnection()) {
+            //connection
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("Select * from movies where id="+id);
+            while(rs.next())
+            {
+                System.out.println(rs.getInt("id")+" "+rs.getString("title"));
+            };
+
+            stmt.executeUpdate("Delete from movies where id="+id);
+
+            rs = stmt.executeQuery("Select * from movies");
+            while(rs.next())
+            {
+                System.out.println(rs.getInt("id")+" "+rs.getString("title"));
+            };
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -160,19 +197,27 @@ public class Main {
 
     public static void main(String[] args) throws ClassNotFoundException {
 //        Class.forName("com.mysql.cj.jdbc.Driver");
-        //MysqlDataSource ds = new MysqlDataSource();
-        JdbcDataSource ds = new JdbcDataSource();
+        MysqlDataSource ds = new MysqlDataSource();
+        //JdbcDataSource ds = new JdbcDataSource();
         ds.setUrl(DB_URL);
         ds.setUser(USER);
         ds.setPassword(PASSWORD);
 
+//        try {
+//            DriverManager.getConnection(DB_URL, USER, PASSWORD);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
         //returnAllActors(ds);
         //getActorWithId(ds, 3);
         //getActorWithNameAndSurnameMatchingPattern(ds, "%b%", "%a%");
-       deleteTableMovies(ds);
+        deleteTableMovies(ds);
         createTableMovies(ds);
         insertIntoMovies(ds);
-        deleteFromMoviesFilmWithId(ds, 2);
+        //editMovie(ds, 2, "Titanic");
+        selectAndDelete(ds, 2);
+
+        //deleteFromMoviesFilmWithId(ds, 2);
 //        switchRecord1And3(ds);
         //switchRecord1And3WithParameters(ds, 3, 1);
     }
